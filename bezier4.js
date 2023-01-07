@@ -22,8 +22,7 @@ function bezier4() {
       joinControlPoints(ctx, P3, P4)
 
       // now draw animated
-      let p, p3, p4, p5, p6, p7
-      for (let t = 0; t < time; t += ANIMATION_STEP) {
+      for (let t = 0; t <= time; t += ANIMATION_STEP) {
         p3 = lerpPoints(P1, P2, t)
         p4 = lerpPoints(P2, P3, t)
         p5 = lerpPoints(P3, P4, t)
