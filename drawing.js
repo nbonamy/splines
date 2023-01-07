@@ -29,7 +29,7 @@ function drawControlPoint(ctx, p, options) {
 
 function drawIntermediatePoint(ctx, p, options) {
   drawControlPoint(ctx, p, {
-    ...{ radius: 2},
+    ...{ radius: 2 },
     ...options
   })
 }
