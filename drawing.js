@@ -15,7 +15,7 @@ function drawPoint(ctx, p, options) {
 
 function drawCurvePoint(ctx, p, options) {
   drawPoint(ctx, p, {
-    ...{ width: 3, radius: 2 },
+    ...{ width: 1.5, radius: 1.5 },
     ...options
   })
 }
