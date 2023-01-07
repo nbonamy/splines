@@ -21,7 +21,7 @@ function bezier4() {
       joinControlPoints(ctx, P2, P3)
       joinControlPoints(ctx, P3, P4)
 
-      // now draw animated
+      // now lerp
       for (let t = 0; t <= time; t += ANIMATION_STEP) {
         p3 = lerpPoints(P1, P2, t)
         p4 = lerpPoints(P2, P3, t)
@@ -31,6 +31,8 @@ function bezier4() {
         p = lerpPoints(p6, p7, t)
         drawPoint(ctx, p, { color: 'red', radius: 2 })
       }
+
+      // draw intermediate points
       if (!isLastFrame(time)) {
         joinPoints(ctx, p3, p4, { color: 'cyan' })
         joinPoints(ctx, p4, p5, { color: 'cyan' })

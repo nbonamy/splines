@@ -1,13 +1,5 @@
 
-const HITTEST_SENSITIVITY = 10
 const ANIMATION_STEP = 0.001
-
-class Point {
-  constructor(x,y) {
-    this.x = x
-    this.y = y
-  }
-}
 
 let animationTime = window.localStorage.animationTime || 4000
 let animationRepeat = true
@@ -67,7 +59,7 @@ function draw() {
 
   // init
   const canvas = document.getElementById('canvas');
-  if (!canvas.getContext) return
+  if (canvas.getContext == null) return
   const ctx = canvas.getContext('2d');
 
   // start
@@ -118,25 +110,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // drag stuff
   canvas.onmousedown = (e) => {
-    if (activeScene.objects == null) return
-    for (let object of activeScene.objects) {
-      if (object instanceof Point) {
-        let d = dist(new Point(e.clientX, e.clientY), object)
-        if (d < HITTEST_SENSITIVITY) {
-          hitTest = object
-          break
-        }
+    let objects = activeScene.objects
+    if (objects == null) return
+    if (typeof objects == 'function') objects = objects()
+    for (let object of objects) {
+      if (object.hittest(e)) {
+        hitTest = object
+        break
       }
     }
   }
   canvas.onmousemove = (e) => {
-    if (hitTest == null) return
-    if (hitTest instanceof Point) {
-      hitTest.x = e.clientX
-      hitTest.y = e.clientY
+    if (hitTest?.move) {
+      hitTest?.move(e)
     }
   }
   canvas.onmouseup = (e) => {
+    if (hitTest?.click) {
+      hitTest?.click(e)
+    }
     hitTest = null
   }
 
