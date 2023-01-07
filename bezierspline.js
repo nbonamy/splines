@@ -118,6 +118,17 @@ function bezierspline() {
         points[i].draw(ctx, i==0, i==points.length-1, objectColor(i, points.length))
       }
 
+      // calc max distance
+      let maxdist = 0
+      for (let i=0; i<points.length-1; i++) {
+        let p1 = points[i].p
+        let p2 = points[i+1].p
+        maxdist = Math.max(maxdist, distance(p1, p2))
+      }
+
+      // calculation increment
+      let inc = Math.max(CALCULATION_STEP, maxdist / 6e5)
+
       // lerp
       let su = segmentAndTime(time, points.length-1)
       for (let s=0; s <= su.s; s++) {
@@ -129,7 +140,7 @@ function bezierspline() {
         let p4 = points[s+1].p
         let color = objectColor(s, points.length)
         
-        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP * (points.length-1) / 2) {
+        for (let u=0; u <= (s==su.s ? su.u : 1); u += inc) {
           p5 = lerpPoints(p1, p2, u)
           p6 = lerpPoints(p2, p3, u)
           p7 = lerpPoints(p3, p4, u)

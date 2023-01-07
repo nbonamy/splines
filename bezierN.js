@@ -37,7 +37,7 @@ function bezierN() {
 
       // now lerp
       let toDraw = []
-      for (let t = 0; t <= time; t += ANIMATION_STEP) {
+      for (let t = 0; t <= time; t += CALCULATION_STEP) {
         toDraw = []
         let toLerp = points
         while (toLerp.length > 1) {

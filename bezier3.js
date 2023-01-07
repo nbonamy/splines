@@ -19,7 +19,7 @@ function bezier3() {
       joinControlPoints(ctx, P2, P3)
 
       // now lerp
-      for (let t = 0; t <= time; t += ANIMATION_STEP) {
+      for (let t = 0; t <= time; t += CALCULATION_STEP) {
         p3 = lerpPoints(P1, P2, t)
         p4 = lerpPoints(P2, P3, t)
         p = lerpPoints(p3, p4, t)
