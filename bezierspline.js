@@ -76,13 +76,11 @@ function bezierspline() {
       new Point(550, 650),
       new Vector(-200, -50),
       new Vector(200, 50),
-      true
     ),
     new ControlPoint(
       new Point(900, 200),
       new Vector(-150, 0),
       new Vector(150, 0),
-      true
     ),
     new ControlPoint(
       new Point(1200, 550),
