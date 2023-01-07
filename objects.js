@@ -11,7 +11,7 @@ class Point {
   }
 
   hittest(e) {
-    let d = dist(new Point(e.clientX, e.clientY), this)
+    let d = distance(new Point(e.clientX, e.clientY), this)
     return d < HITTEST_SENSITIVITY
   }
   

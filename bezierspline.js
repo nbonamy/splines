@@ -19,7 +19,7 @@ class ControlPoint {
     ctx.fillRect(p.x-HANDLE_SIZE, p.y-HANDLE_SIZE, 2*HANDLE_SIZE+1, 2*HANDLE_SIZE+1)
   }
   draw(ctx, first, last, color) {
-    drawControlPoint(ctx, this.p, { color: color, filled: this.sym })
+    drawControlPoint(ctx, this.p, { color: color, radius: this.sym ? 6 : 5, filled: true })
     if (!first) this.drawHandle(ctx, this.endpoint1(), color)
     if (!last) this.drawHandle(ctx, this.endpoint2(), color)
     if (!first) joinControlPoints(ctx, this.p, this.endpoint1(), { color: color })
@@ -87,7 +87,7 @@ function bezierspline() {
     new ControlPoint(
       new Point(1200, 550),
       new Vector(-300, 150),
-      new Vector(0, 0)
+      new Vector(200, 200)
     ),
   ]
 
@@ -129,7 +129,7 @@ function bezierspline() {
         let p4 = points[s+1].p
         let color = objectColor(s, points.length)
         
-        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP * (points.length-1)) {
+        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP * (points.length-1) / 2) {
           p5 = lerpPoints(p1, p2, u)
           p6 = lerpPoints(p2, p3, u)
           p7 = lerpPoints(p3, p4, u)
