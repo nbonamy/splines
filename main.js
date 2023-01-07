@@ -59,22 +59,22 @@ function draw() {
   // calc fps
   let frameEnd = performance.now()
   let frameDuration = frameEnd - frameStart
-  let fps = Math.round(1000 / frameDuration)
   
   // add to history
-  perfHistory.push({ duration: frameDuration, fps: fps })
+  perfHistory.push(frameDuration)
   if (perfHistory.length > PERF_HISTORY_SIZE) {
     perfHistory.shift()
   }
 
   // calc average duration
-  let totalDuration = perfHistory.reduce((acc,h) => acc + h.duration, 0)
-  let avgDuration = totalDuration / perfHistory.length
+  let totalDuration = perfHistory.reduce((acc, h) => acc + h, 0)
+  let avgDuration = Math.round(totalDuration / perfHistory.length)
+
 
   // write fps
   ctx.fillStyle = 'white'
   ctx.font = '12pt sans-serif'
-  ctx.fillText(`Speed: ${Math.round(avgDuration)} ms`, 10, window.innerHeight - 20)
+  ctx.fillText(`Speed: ${avgDuration} ms`, 10, window.innerHeight - 20)
 
   // iterate
   requestAnimationFrame(draw)
