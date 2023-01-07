@@ -9,18 +9,21 @@ let hitTest = null
 let startTime = 0
 
 function drawPoint(ctx, p, options) {
+  ctx.fillStyle = options?.color || 'white'
   ctx.strokeStyle = options?.color || 'white'
   ctx.lineWidth = options?.width || 1
   ctx.beginPath()
   ctx.arc(p.x, p.y, options?.radius || 1, 0, Math.PI*2, true)
-  ctx.stroke()
+  if (options?.filled) ctx.fill()
+  else ctx.stroke()
 }
 
 function drawControlPoint(ctx, p, options) {
   drawPoint(ctx, p, {
     color: options?.color || 'white',
     width: options?.width || 3,
-    radius: options?.radius || 5
+    radius: options?.radius || 5,
+    filled: options?.filled || false,
   })
 }
 
@@ -48,6 +51,13 @@ function lerpPoints(p1, p2, t) {
 
 function dist(p1, p2) {
   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2))
+}
+
+function segmentAndTime(time, count) {
+  let globalTime = (time * animationTime) / (animationTime / count)
+  let segment = Math.floor(globalTime)
+  let localTime = globalTime - segment
+  return { s: segment, u: localTime }
 }
 
 function isLastFrame(time) {
@@ -123,9 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hitTest?.move?.(e)
   }
   canvas.onmouseup = (e) => {
-    if (hitTest?.hittest?.(e)) {
-      hitTest?.click?.(e)
-    }
+    hitTest?.click?.(e)
     hitTest = null
   }
 

@@ -9,17 +9,34 @@ class Point {
     this.x = x
     this.y = y
   }
-  
+
   hittest(e) {
     let d = dist(new Point(e.clientX, e.clientY), this)
     return d < HITTEST_SENSITIVITY
   }
   
   move(e) {
-    this.x = e.clientX
-    this.y = e.clientY
+    if (e.clientX != this.x || e.clientY != this.y) {
+      this.x = e.clientX
+      this.y = e.clientY
+      return true
+    } else {
+      return false
+    }
   }
 
+}
+
+class Vector extends Point {
+  endpoint(origin) {
+    return new Point(
+      origin.x + this.x,
+      origin.y + this.y
+    )
+  }
+  hittest(origin, e) {
+    return this.endpoint(origin).hittest(e)
+  }
 }
 
 class Button {
@@ -51,8 +68,10 @@ class Button {
     return e.clientX >= rc.left && e.clientX <= rc.right && e.clientY >= rc.top && e.clientY <= rc.bottom
   }
 
-  click() {
-    this.cb()
+  click(e) {
+    if (this.hittest(e)) {
+      this.cb()
+    }
   }
   
   draw(ctx, options) {
