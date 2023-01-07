@@ -1,9 +1,6 @@
 
-const PT_RADIUS = 5
 const HITTEST_SENSITIVITY = 10
 const ANIMATION_STEP = 0.001
-let ANIMATION_TIME = window.localStorage.animationTime || 4000
-let ANIMATION_REPEAT = true
 
 class Point {
   constructor(x,y) {
@@ -12,12 +9,13 @@ class Point {
   }
 }
 
-let hitTest = {
-  objects: null,
-  active: null
-}
+let animationTime = window.localStorage.animationTime || 4000
+let animationRepeat = true
 
-let START_TIME = performance.now()
+let activeScene = null
+let hitTest = null
+
+let startTime = performance.now()
 
 function drawPoint(ctx, p, options) {
   ctx.strokeStyle = options?.color || 'white'
@@ -62,7 +60,7 @@ function dist(p1, p2) {
 }
 
 function isLastFrame(time) {
-  return ANIMATION_REPEAT == false && time >= 1
+  return animationRepeat == false && time >= 1
 }
 
 function draw() {
@@ -80,15 +78,15 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   // time
-  let time = performance.now() - START_TIME
-  if (ANIMATION_REPEAT) {
-    time = (time % ANIMATION_TIME) / ANIMATION_TIME
+  let time = performance.now() - startTime
+  if (animationRepeat) {
+    time = (time % animationTime) / animationTime
   } else {
-    time = Math.min(1, time / ANIMATION_TIME)
+    time = Math.min(1, time / animationTime)
   }
 
   // specific draw
-  do_draw(ctx, time)
+  activeScene.draw(ctx, time)
 
   // calc fps
   const frameEnd = performance.now()
@@ -107,10 +105,8 @@ function draw() {
 
 function change_scene(scene) {
   window.localStorage.scene = scene
-  START_TIME = performance.now()
-  let scene_desc = eval(`${scene}()`)
-  hitTest.objects = scene_desc.objects
-  do_draw = scene_desc.draw
+  startTime = performance.now()
+  activeScene = eval(`${scene}()`)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -122,39 +118,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // drag stuff
   canvas.onmousedown = (e) => {
-    if (hitTest.objects == null) return
-    for (let object of hitTest.objects) {
+    if (activeScene.objects == null) return
+    for (let object of activeScene.objects) {
       if (object instanceof Point) {
         let d = dist(new Point(e.clientX, e.clientY), object)
         if (d < HITTEST_SENSITIVITY) {
-          hitTest.active = object
+          hitTest = object
           break
         }
       }
     }
   }
   canvas.onmousemove = (e) => {
-    if (hitTest.active == null) return
-    if (hitTest.active instanceof Point) {
-      hitTest.active.x = e.clientX
-      hitTest.active.y = e.clientY
+    if (hitTest == null) return
+    if (hitTest instanceof Point) {
+      hitTest.x = e.clientX
+      hitTest.y = e.clientY
     }
   }
   canvas.onmouseup = (e) => {
-    hitTest.active = null
+    hitTest = null
   }
 
   // animation repeat
   let repeat_check = document.querySelector('[name=repeat]')
-  repeat_check.checked = ANIMATION_REPEAT
-  repeat_check.onchange = (_) => ANIMATION_REPEAT = repeat_check.checked
+  repeat_check.checked = animationRepeat
+  repeat_check.onchange = (_) => animationRepeat = repeat_check.checked
   
   // animation speed
   let speed_range = document.querySelector('[name=speed]')
-  speed_range.value = speed_range.max - ANIMATION_TIME
+  speed_range.value = speed_range.max - animationTime
   speed_range.oninput = (_) => {
-    ANIMATION_TIME = Math.max(100, speed_range.max - speed_range.value)
-    window.localStorage.animationTime = ANIMATION_TIME
+    animationTime = Math.max(100, speed_range.max - speed_range.value)
+    window.localStorage.animationTime = animationTime
   }
 
   // scene
@@ -169,4 +165,5 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // now draw
   draw()
+
 })
