@@ -1,4 +1,6 @@
 
+const HANDLE_SIZE = 3
+
 class ControlPoint {
   constructor(p, v1, v2) {
     this.p = p
@@ -12,10 +14,14 @@ class ControlPoint {
   endpoint2() {
     return this.v2.endpoint(this.p)
   }
+  drawHandle(ctx, p, color) {
+    ctx.fillStyle = color
+    ctx.fillRect(p.x-HANDLE_SIZE, p.y-HANDLE_SIZE, 2*HANDLE_SIZE+1, 2*HANDLE_SIZE+1)
+  }
   draw(ctx, first, last, color) {
     drawControlPoint(ctx, this.p, { color: color, filled: this.sym })
-    if (!first) drawControlPoint(ctx, this.endpoint1(), { color: color, radius: 3 })
-    if (!last) drawControlPoint(ctx, this.endpoint2(), { color: color, radius: 3 })
+    if (!first) this.drawHandle(ctx, this.endpoint1(), color)
+    if (!last) this.drawHandle(ctx, this.endpoint2(), color)
     if (!first) joinControlPoints(ctx, this.p, this.endpoint1(), { color: color })
     if (!last) joinControlPoints(ctx, this.p, this.endpoint2(), { color: color })
   }
@@ -115,7 +121,7 @@ function bezierspline() {
         let p2 = points[s].endpoint2()
         let p3 = points[s+1].endpoint1()
         let p4 = points[s+1].p
-        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP) {
+        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP / (points.length-1)) {
           p5 = lerpPoints(p1, p2, u)
           p6 = lerpPoints(p2, p3, u)
           p7 = lerpPoints(p3, p4, u)
