@@ -3,11 +3,9 @@ const ANIMATION_STEP = 0.001
 
 let animationTime = window.localStorage.animationTime || 4000
 let animationRepeat = true
-
 let activeScene = null
 let hitTest = null
-
-let startTime = performance.now()
+let startTime = 0
 
 function drawPoint(ctx, p, options) {
   ctx.strokeStyle = options?.color || 'white'
@@ -114,20 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (objects == null) return
     if (typeof objects == 'function') objects = objects()
     for (let object of objects) {
-      if (object.hittest(e)) {
+      if (object.hittest?.(e)) {
         hitTest = object
         break
       }
     }
   }
   canvas.onmousemove = (e) => {
-    if (hitTest?.move) {
-      hitTest?.move(e)
-    }
+    hitTest?.move?.(e)
   }
   canvas.onmouseup = (e) => {
-    if (hitTest?.click) {
-      hitTest?.click(e)
+    if (hitTest?.hittest?.(e)) {
+      hitTest?.click?.(e)
     }
     hitTest = null
   }

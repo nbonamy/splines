@@ -51,10 +51,8 @@ class Button {
     return e.clientX >= rc.left && e.clientX <= rc.right && e.clientY >= rc.top && e.clientY <= rc.bottom
   }
 
-  click(e) {
-    if (this.hittest(e)) {
-      this.cb()
-    }
+  click() {
+    this.cb()
   }
   
   draw(ctx, options) {
