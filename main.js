@@ -1,10 +1,12 @@
 
 const ANIMATION_STEP = 0.001
+const PERF_HISTORY_SIZE = 50
 
 let showIntermediate = true
 let animationTime = window.localStorage.animationTime || 4000
 let animationRepeat = true
 let activeScene = null
+let perfHistory = []
 let hitTest = null
 let startTime = 0
 
@@ -55,14 +57,24 @@ function draw() {
   activeScene.draw(ctx, time)
 
   // calc fps
-  const frameEnd = performance.now()
-  const frameDuration = frameEnd - frameStart
-  const fps = Math.round(1000 / frameDuration)
+  let frameEnd = performance.now()
+  let frameDuration = frameEnd - frameStart
+  let fps = Math.round(1000 / frameDuration)
+  
+  // add to history
+  perfHistory.push({ duration: frameDuration, fps: fps })
+  if (perfHistory.length > PERF_HISTORY_SIZE) {
+    perfHistory.shift()
+  }
+
+  // calc average duration
+  let totalDuration = perfHistory.reduce((acc,h) => acc + h.duration, 0)
+  let avgDuration = totalDuration / perfHistory.length
 
   // write fps
   ctx.fillStyle = 'white'
   ctx.font = '12pt sans-serif'
-  ctx.fillText(`FPS: ${frameDuration} ms`, 10, window.innerHeight - 20)
+  ctx.fillText(`Speed: ${Math.round(avgDuration)} ms`, 10, window.innerHeight - 20)
 
   // iterate
   requestAnimationFrame(draw)
