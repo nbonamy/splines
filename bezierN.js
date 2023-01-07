@@ -1,7 +1,7 @@
 
 function bezierN() {
 
-  const colors = [ 'cyan', 'yellow', 'green', 'pink', 'orange', 'lime', 'indigo' ]
+  const colors = [ 'cyan', 'green', 'yellow', 'pink', 'orange', 'lime', 'indigo' ]
 
   let points = [
     new Point(500,500),
