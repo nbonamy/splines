@@ -33,7 +33,7 @@ function bezier4() {
       }
 
       // draw intermediate points
-      if (!isLastFrame(time)) {
+      if (showIntermediate && !isLastFrame(time)) {
         joinPoints(ctx, p3, p4, { color: 'cyan' })
         joinPoints(ctx, p4, p5, { color: 'cyan' })
         joinPoints(ctx, p6, p7, { color: 'green' })

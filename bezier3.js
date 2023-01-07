@@ -27,7 +27,7 @@ function bezier3() {
       }
 
       // draw intermediate points
-      if (!isLastFrame(time)) {
+      if (showIntermediate && !isLastFrame(time)) {
         joinPoints(ctx, p3, p4, { color: 'cyan' })
         drawControlPoint(ctx, p3, { color: 'cyan' })
         drawControlPoint(ctx, p4, { color: 'cyan' })

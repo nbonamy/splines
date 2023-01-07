@@ -54,7 +54,7 @@ function bezierN() {
       }
 
       // draw intermediate points
-      if (!isLastFrame(time)) {
+      if (showIntermediate && !isLastFrame(time)) {
         for (let i=0; i<toDraw.length; i++) {
           let color = colors[i % colors.length]
           for (let j=0; j<toDraw[i].length; j++) {

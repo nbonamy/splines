@@ -1,6 +1,7 @@
 
 const ANIMATION_STEP = 0.001
 
+let showIntermediate = true
 let animationTime = window.localStorage.animationTime || 4000
 let animationRepeat = true
 let activeScene = null
@@ -128,6 +129,11 @@ document.addEventListener('DOMContentLoaded', () => {
     hitTest = null
   }
 
+  // intermediate
+  let intermediate_check = document.querySelector('[name=intermediate]')
+  intermediate_check.checked = showIntermediate
+  intermediate_check.onchange = (_) => showIntermediate = intermediate_check.checked
+  
   // animation repeat
   let repeat_check = document.querySelector('[name=repeat]')
   repeat_check.checked = animationRepeat
