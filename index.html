@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Canvas experiment</title>
+    <style>
+      * { padding: 0; margin: 0; }
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #params {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        font-family: sans-serif;
+        color: white;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid white;
+        padding: 8px;
+      }
+      #params > div {
+        margin-top: 4px;
+        margin-bottom: 4px;
+      }
+      #params label {
+        display: inline-block;
+        text-align: right;
+        margin-right: 8px;
+        width: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <div id="params">
+      <div>
+        <label for="repeat">Repeat Animation</label>
+        <input type="checkbox" name="repeat"/>
+      </div>
+      <div>
+        <label for="speed">Animation Speed</label>
+        <input type="range" min="100" max="10000" name="speed" />
+      </div>
+      <div>
+        <label for="scene">Scene</label>
+        <select name="scene">
+          <option value="bezier3">Bezier 3 points</option>
+          <option value="bezier4">Bezier 4 points</option>
+        </select>
+      </div>
+    </div>
+    <script src="main.js"></script>
+    <script src="bezier3.js"></script>
+    <script src="bezier4.js"></script>
+  </body>
+</html>
