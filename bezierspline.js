@@ -2,11 +2,11 @@
 const HANDLE_SIZE = 3
 
 class ControlPoint {
-  constructor(p, v1, v2) {
+  constructor(p, v1, v2, sym) {
     this.p = p
     this.v1 = v1
     this.v2 = v2
-    this.sym = false
+    this.sym = sym || false
   }
   endpoint1() {
     return this.v1.endpoint(this.p)
@@ -39,6 +39,7 @@ class ControlPoint {
         this.moved = true
       }
     } else {
+      // is v1 or v2
       this.active.x = e.clientX - this.p.x
       this.active.y = e.clientY - this.p.y
       if (this.sym) {
@@ -65,23 +66,28 @@ class ControlPoint {
 
 function bezierspline() {
 
-  const colors = [ 'blue', 'rgb(170, 255, 0)', 'red', 'yellow', 'pink' ]
-
   let points = [
     new ControlPoint(
-      new Point(200, 200),
+      new Point(500, 300),
       new Vector(0, 0),
-      new Vector(0, 100)
+      new Vector(-250, 75)
     ),
     new ControlPoint(
-      new Point(500, 500),
-      new Vector(0, -100),
-      new Vector(50, 100)
+      new Point(550, 650),
+      new Vector(-200, -50),
+      new Vector(200, 50),
+      true
     ),
     new ControlPoint(
-      new Point(800, 300),
-      new Vector(-100, -100),
-      new Vector(0, 30)
+      new Point(900, 200),
+      new Vector(-150, 0),
+      new Vector(150, 0),
+      true
+    ),
+    new ControlPoint(
+      new Point(1200, 550),
+      new Vector(-300, 150),
+      new Vector(0, 0)
     ),
   ]
 
@@ -109,18 +115,20 @@ function bezierspline() {
 
       // draw our points and join them
       for (let i=0; i<points.length; i++) {
-        points[i].draw(ctx, i==0, i==points.length-1, colors[i%colors.length])
-
+        points[i].draw(ctx, i==0, i==points.length-1, objectColor(i, points.length))
       }
 
       // lerp
       let su = segmentAndTime(time, points.length-1)
       for (let s=0; s <= su.s; s++) {
         if (s == points.length - 1) continue
+        
         let p1 = points[s].p
         let p2 = points[s].endpoint2()
         let p3 = points[s+1].endpoint1()
         let p4 = points[s+1].p
+        let color = objectColor(s, points.length)
+        
         for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP / (points.length-1)) {
           p5 = lerpPoints(p1, p2, u)
           p6 = lerpPoints(p2, p3, u)
@@ -128,21 +136,22 @@ function bezierspline() {
           p8 = lerpPoints(p5, p6, u)
           p9 = lerpPoints(p6, p7, u)
           p = lerpPoints(p8, p9, u)
-          drawPoint(ctx, p, { color: colors[s%colors.length] })
+          pColor = intermediateColor(u, s, points.length)
+          drawCurvePoint(ctx, p, { color: pColor })
         }
 
         // draw intermediate points
         if (s == su.s && showIntermediate && !isLastFrame(time)) {
-          joinPoints(ctx, p2, p3, { color: colors[s%colors.length], width: 0.5 })
-          joinPoints(ctx, p5, p6, { color: 'cyan', width: 0.5 })
-          joinPoints(ctx, p6, p7, { color: 'cyan', width: 0.5 })
-          joinPoints(ctx, p8, p9, { color: 'green', width: 0.5 })
-          drawControlPoint(ctx, p5, { color: 'cyan', radius: 2 })
-          drawControlPoint(ctx, p6, { color: 'cyan', radius: 2 })
-          drawControlPoint(ctx, p7, { color: 'cyan', radius: 2 })
-          drawControlPoint(ctx, p8, { color: 'green', radius: 2 })
-          drawControlPoint(ctx, p9, { color: 'green', radius: 2 })
-          drawControlPoint(ctx, p, { color: colors[s%colors.length] })
+          joinIntermediatePoints(ctx, p2, p3, { color: color })
+          joinIntermediatePoints(ctx, p5, p6, { color: 'cyan' })
+          joinIntermediatePoints(ctx, p6, p7, { color: 'cyan' })
+          joinIntermediatePoints(ctx, p8, p9, { color: 'green' })
+          drawIntermediatePoint(ctx, p5, { color: 'cyan' })
+          drawIntermediatePoint(ctx, p6, { color: 'cyan' })
+          drawIntermediatePoint(ctx, p7, { color: 'cyan' })
+          drawIntermediatePoint(ctx, p8, { color: 'green' })
+          drawIntermediatePoint(ctx, p9, { color: 'green' })
+          drawIntermediatePoint(ctx, p, { color: pColor })
         }
 
       }

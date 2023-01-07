@@ -8,41 +8,6 @@ let activeScene = null
 let hitTest = null
 let startTime = 0
 
-function drawPoint(ctx, p, options) {
-  ctx.fillStyle = options?.color || 'white'
-  ctx.strokeStyle = options?.color || 'white'
-  ctx.lineWidth = options?.width || 1
-  ctx.beginPath()
-  ctx.arc(p.x, p.y, options?.radius || 1, 0, Math.PI*2, true)
-  if (options?.filled) ctx.fill()
-  else ctx.stroke()
-}
-
-function drawControlPoint(ctx, p, options) {
-  drawPoint(ctx, p, {
-    color: options?.color || 'white',
-    width: options?.width || 3,
-    radius: options?.radius || 5,
-    filled: options?.filled || false,
-  })
-}
-
-function joinPoints(ctx, p1, p2, options) {
-  ctx.strokeStyle = options?.color || 'white'
-  ctx.lineWidth = options?.width || 1
-  ctx.beginPath()
-  ctx.moveTo(p1.x, p1.y)
-  ctx.lineTo(p2.x, p2.y)
-  ctx.stroke()
-}
-
-function joinControlPoints(ctx, p1, p2, options) {
-  joinPoints(ctx, p1, p2, {
-    color: options?.color || '#444',
-    width: options?.width
-  })
-}
-
 function lerpPoints(p1, p2, t) {
   let x = (1-t) * p1.x + t * p2.x
   let y = (1-t) * p1.y + t * p2.y

@@ -29,20 +29,20 @@ function bezier4() {
         p6 = lerpPoints(p3, p4, t)
         p7 = lerpPoints(p4, p5, t)
         p = lerpPoints(p6, p7, t)
-        drawPoint(ctx, p, { color: 'red', radius: 2 })
+        drawCurvePoint(ctx, p)
       }
 
       // draw intermediate points
       if (showIntermediate && !isLastFrame(time)) {
-        joinPoints(ctx, p3, p4, { color: 'cyan' })
-        joinPoints(ctx, p4, p5, { color: 'cyan' })
-        joinPoints(ctx, p6, p7, { color: 'green' })
-        drawControlPoint(ctx, p3, { color: 'cyan' })
-        drawControlPoint(ctx, p4, { color: 'cyan' })
-        drawControlPoint(ctx, p5, { color: 'cyan' })
-        drawControlPoint(ctx, p6, { color: 'cyan' })
-        drawControlPoint(ctx, p7, { color: 'green' })
-        drawControlPoint(ctx, p, { color: 'red' })
+        joinIntermediatePoints(ctx, p3, p4, { color: objectColor(1, 3) })
+        joinIntermediatePoints(ctx, p4, p5, { color: objectColor(1, 3) })
+        joinIntermediatePoints(ctx, p6, p7, { color: objectColor(5, 6) })
+        drawIntermediatePoint(ctx, p3, { color: objectColor(1, 3) })
+        drawIntermediatePoint(ctx, p4, { color: objectColor(1, 3) })
+        drawIntermediatePoint(ctx, p5, { color: objectColor(1, 3) })
+        drawIntermediatePoint(ctx, p6, { color: objectColor(5, 6) })
+        drawIntermediatePoint(ctx, p7, { color: objectColor(5, 6) })
+        drawControlPoint(ctx, p)
       }
 
     }

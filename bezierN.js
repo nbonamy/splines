@@ -1,8 +1,6 @@
 
 function bezierN() {
 
-  const colors = [ 'cyan', 'green', 'yellow', 'pink', 'orange', 'lime', 'indigo' ]
-
   let points = [
     new Point(500,500),
     new Point(750,250)
@@ -50,17 +48,17 @@ function bezierN() {
           toLerp = newPoints
           toDraw.push(newPoints)
         }
-        drawPoint(ctx, toLerp[0], { color: 'red', radius: 2 })
+        drawCurvePoint(ctx, toLerp[0])
       }
 
       // draw intermediate points
       if (showIntermediate && !isLastFrame(time)) {
         for (let i=0; i<toDraw.length; i++) {
-          let color = colors[i % colors.length]
+          let color = objectColor(i, toDraw.length)
           for (let j=0; j<toDraw[i].length; j++) {
-            drawControlPoint(ctx, toDraw[i][j], { color: toDraw[i].length == 1 ? 'red' : color })
+            drawIntermediatePoint(ctx, toDraw[i][j], { color: toDraw[i].length == 1 ? null : color })
             if (j < toDraw[i].length - 1) {
-              joinPoints(ctx, toDraw[i][j], toDraw[i][j+1], { color: color })
+              joinIntermediatePoints(ctx, toDraw[i][j], toDraw[i][j+1], { color: color })
             }
           }
         }
