@@ -1,5 +1,5 @@
 
-const ANIMATION_STEP = 0.01
+const ANIMATION_STEP = 0.001
 const PERF_HISTORY_SIZE = 50
 
 let showIntermediate = true

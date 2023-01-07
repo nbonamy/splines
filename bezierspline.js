@@ -129,7 +129,7 @@ function bezierspline() {
         let p4 = points[s+1].p
         let color = objectColor(s, points.length)
         
-        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP / (points.length-1)) {
+        for (let u=0; u <= (s==su.s ? su.u : 1); u += ANIMATION_STEP * (points.length-1)) {
           p5 = lerpPoints(p1, p2, u)
           p6 = lerpPoints(p2, p3, u)
           p7 = lerpPoints(p3, p4, u)
