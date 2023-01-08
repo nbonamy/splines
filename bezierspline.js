@@ -13,11 +13,11 @@ class ControlPoint {
   }
   
   endpoint1() {
-    return this.v1.endpoint(this.p)
+    return this.p.movedby(this.v1)
   }
   
   endpoint2() {
-    return this.v2.endpoint(this.p)
+    return this.p.movedby(this.v2)
   }
   
   drawHandle(ctx, p, color) {
@@ -97,9 +97,9 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, yield) {
   for (let u=0; u <= maxtime; u += inctime) {
     if (u != 0) {
       // move points with their vector
-      p5 = v1.endpoint(p5)
-      p6 = v2.endpoint(p6)
-      p7 = v3.endpoint(p7)
+      p5 = p5.movedby(v1)
+      p6 = p6.movedby(v2)
+      p7 = p7.movedby(v3)
     }
     p8 = lerpPoints(p5, p6, u)
     p9 = lerpPoints(p6, p7, u)

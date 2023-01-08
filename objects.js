@@ -5,6 +5,7 @@ const BUTTON_HEIGHT = 18
 const BUTTON_FONT = '12pt sans-serif'
 
 class Point {
+  
   constructor(arg1, arg2) {
     if (arg1 instanceof Point) {
       this.x = arg1.x
@@ -38,6 +39,13 @@ class Point {
     }
   }
 
+  movedby(vector) {
+    return new Point(
+      this.x + vector.x,
+      this.y + vector.y
+    )
+  }
+
 }
 
 class Vector extends Point {
@@ -61,17 +69,6 @@ class Vector extends Point {
     this.y = other.y
   }
 
-  endpoint(origin) {
-    return new Point(
-      origin.x + this.x,
-      origin.y + this.y
-    )
-  }
-  
-  hittest(origin, e) {
-    return this.endpoint(origin).hittest(e)
-  }
-  
   norm() {
     return Math.sqrt(this.x*this.x + this.y*this.y)
   }
