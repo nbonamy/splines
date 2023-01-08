@@ -12,9 +12,10 @@ let hitTest = null
 let startTime = 0
 
 function lerpPoints(p1, p2, t) {
-  let x = (1-t) * p1.x + t * p2.x
-  let y = (1-t) * p1.y + t * p2.y
-  return new Point(x, y)
+  return new Point(
+    (1-t) * p1.x + t * p2.x,
+    (1-t) * p1.y + t * p2.y
+  )
 }
 
 function distance(p1, p2) {

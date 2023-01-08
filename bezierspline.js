@@ -1,7 +1,7 @@
 
 const HANDLE_SIZE = 3
 
-let method = 'polynomial'
+let method = window.localStorage.bezierSplineMethod||'polynomial'
 let showVelocity = true
 
 class ControlPoint {
@@ -11,16 +11,20 @@ class ControlPoint {
     this.v2 = v2
     this.sym = sym || false
   }
+  
   endpoint1() {
     return this.v1.endpoint(this.p)
   }
+  
   endpoint2() {
     return this.v2.endpoint(this.p)
   }
+  
   drawHandle(ctx, p, color) {
     ctx.fillStyle = color
     ctx.fillRect(p.x-HANDLE_SIZE, p.y-HANDLE_SIZE, 2*HANDLE_SIZE+1, 2*HANDLE_SIZE+1)
   }
+  
   draw(ctx, first, last, color) {
     drawControlPoint(ctx, this.p, { color: color, radius: this.sym ? 6 : 5, filled: true })
     if (!first) this.drawHandle(ctx, this.endpoint1(), color)
@@ -28,6 +32,7 @@ class ControlPoint {
     if (!first) joinControlPoints(ctx, this.p, this.endpoint1(), { color: color })
     if (!last) joinControlPoints(ctx, this.p, this.endpoint2(), { color: color })
   }
+  
   hittest(e) {
     this.active = null
     this.moved = false
@@ -36,38 +41,32 @@ class ControlPoint {
     else if (this.endpoint2().hittest(e)) this.active = this.v2
     return this.active
   }
+  
   move(e) {
     if (this.active == this.p) {
       if (this.p.move(e)) {
         this.moved = true
       }
     } else {
-      // is v1 or v2
-      this.active.x = e.clientX - this.p.x
-      this.active.y = e.clientY - this.p.y
+      this.active.set(new Vector(this.p, new Point(e.clientX, e.clientY)))
       if (this.sym) {
-        if (this.active == this.v1) {
-          this.v2.x = -this.v1.x
-          this.v2.y = -this.v1.y 
-        } else {
-          this.v1.x = -this.v2.x
-          this.v1.y = -this.v2.y 
-        }
+        if (this.active == this.v1) this.v2 = this.v1.opposite()
+        else this.v1 = this.v2.opposite()
       }
     }
   }
+
   click(e) {
     if (this.active == this.p && this.moved == false) {
       this.sym = !this.sym
       if (this.sym) {
-        this.v2.x = -this.v1.x
-        this.v2.y = -this.v1.y 
+        this.v2 = this.v1.opposite()
       }
     }
   }
 }
 
-function lerp4(p1, p2, p3, p4, maxtime, inctime, cb) {
+function lerp4(p1, p2, p3, p4, maxtime, inctime, yield) {
 
   for (let u=0; u <= maxtime; u += inctime) {
     p5 = lerpPoints(p1, p2, u)
@@ -76,7 +75,7 @@ function lerp4(p1, p2, p3, p4, maxtime, inctime, cb) {
     p8 = lerpPoints(p5, p6, u)
     p9 = lerpPoints(p6, p7, u)
     p = lerpPoints(p8, p9, u)
-    cb(u, p)
+    yield(u, p)
   }
 
   return [
@@ -87,14 +86,14 @@ function lerp4(p1, p2, p3, p4, maxtime, inctime, cb) {
 
 }
 
-function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, cb) {
+function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, yield) {
 
-  let p5 = p1
-  let p6 = p2
-  let p7 = p3
-  let v1 = new Vector(p2.x-p1.x, p2.y-p1.y).scaled(inctime)
-  let v2 = new Vector(p3.x-p2.x, p3.y-p2.y).scaled(inctime)
-  let v3 = new Vector(p4.x-p3.x, p4.y-p3.y).scaled(inctime)
+  let p5 = p1.clone()
+  let p6 = p2.clone()
+  let p7 = p3.clone()
+  let v1 = new Vector(p1, p2).scaled(inctime)
+  let v2 = new Vector(p2, p3).scaled(inctime)
+  let v3 = new Vector(p3, p4).scaled(inctime)
 
   for (let u=0; u <= maxtime; u += inctime) {
     if (u != 0) {
@@ -105,7 +104,7 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, cb) {
     p8 = lerpPoints(p5, p6, u)
     p9 = lerpPoints(p6, p7, u)
     p = lerpPoints(p8, p9, u)
-    cb(u, p)
+    yield(u, p)
   }
 
   return [
@@ -117,35 +116,18 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, cb) {
 }
 
 // https://youtu.be/jvPPXbo87ds?t=433
-function polynomial(p1, p2, p3, p4, maxtime, inctime, cb) {
+function polynomial(p1, p2, p3, p4, maxtime, inctime, yield) {
 
-  let v0 = new Vector(
-    p1.x,
-    p1.y
-  )
-  let v1 = new Vector(
-    -3 * p1.x + 3 * p2.x,
-    -3 * p1.y + 3 * p2.y,
-  )
-  let v2 = new Vector(
-    3 * p1.x - 6 * p2.x + 3 * p3.x,
-    3 * p1.y - 6 * p2.y + 3 * p3.y,
-  )
-  let v3 = new Vector(
-    - p1.x + 3 * p2.x - 3 * p3.x + p4.x,
-    - p1.y + 3 * p2.y - 3 * p3.y + p4.y,
-  )
+  let v0 = new Vector(p1)
+  let v1 = new Vector(p1).scale(-3).add(new Vector(p2).scale(3))
+  let v2 = new Vector(p1).scale(3).add(new Vector(p2).scale(-6)).add(new Vector(p3).scale(3))
+  let v3 = new Vector(p1).scale(-1).add(new Vector(p2).scale(3)).add(new Vector(p3).scale(-3)).add(new Vector(p4))
     
   for (let u=0; u <= maxtime; u += inctime) {
-
     let u2 = u * u
     let u3 = u2 * u
-    let p = new Point(
-      v0.x + u * v1.x + u2 * v2.x + u3 * v3.x, 
-      v0.y + u * v1.y + u2 * v2.y + u3 * v3.y, 
-    )
-
-    cb(u, p)
+    let p = v0.clone().add(v1.scaled(u)).add(v2.scaled(u2)).add(v3.scaled(u3))
+    yield(u, p)
   }
 
   return null
@@ -198,7 +180,10 @@ function bezierspline() {
           'polynomial': 'Polynomial'
         },
         selected: method,
-        callback: (m) => method = m
+        callback: (m) => {
+          method = m
+          window.localStorage.bezierSplineMethod = method
+        }
       },
       {
         type: 'checkbox',

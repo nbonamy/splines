@@ -5,9 +5,18 @@ const BUTTON_HEIGHT = 18
 const BUTTON_FONT = '12pt sans-serif'
 
 class Point {
-  constructor(x,y) {
-    this.x = x
-    this.y = y
+  constructor(arg1, arg2) {
+    if (arg1 instanceof Point) {
+      this.x = arg1.x
+      this.y = arg1.y
+    } else {
+      this.x = arg1
+      this.y = arg2
+    }
+  }
+
+  clone() {
+    return new Point(this.x, this.y)
   }
 
   hittest(e) {
@@ -28,25 +37,69 @@ class Point {
 }
 
 class Vector extends Point {
+
+  constructor(arg1, arg2) {
+    if (arg1 instanceof Point && arg2 instanceof Point) {
+      super(arg2.x - arg1.x, arg2.y - arg1.y)
+    } else if (arg1 instanceof Point || arg1 instanceof Vector) {
+      super(arg1)
+    } else {
+      super(arg1, arg2)
+    }
+  }
+
+  clone() {
+    return new Vector(this.x, this.y)
+  }
+
+  set(other) {
+    this.x = other.x
+    this.y = other.y
+  }
+
   endpoint(origin) {
     return new Point(
       origin.x + this.x,
       origin.y + this.y
     )
   }
+  
   hittest(origin, e) {
     return this.endpoint(origin).hittest(e)
   }
+  
   norm() {
     return Math.sqrt(this.x*this.x + this.y*this.y)
   }
+
+  scale(s) {
+    this.x *= s
+    this.y *= s
+    return this
+  }
+
+  add(other) {
+    this.x += other.x
+    this.y += other.y
+    return this
+  }
+  
   scaled(scale) {
     return new Vector(this.x * scale, this.y * scale)
   }
+  
   normalized() {
     let n = this.norm()
     if (n < 1e-6) n = 1
     return this.scaled(1/n)
+  }
+
+  opposite() {
+    return new Vector(-this.x, -this.y)
+  }
+
+  dot(other) {
+    return this.x * other.x + this.y + other.y
   }
 }
 
