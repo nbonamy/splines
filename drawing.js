@@ -1,4 +1,6 @@
 
+const ANALYSIS_BOX_SIZE = 200
+
 function drawPoint(ctx, p, options) {
   options = {
     ...{ color: 'white', width: 1, radius: 1, filled: false, },
@@ -61,6 +63,16 @@ function joinIntermediatePoints(ctx, p1, p2, options) {
   })
 }
 
+function drawText(ctx, text, x, y, options) {
+  options = {
+    ...{ color: 'white', font: '12pt sans-serif', },
+    ...options
+  }
+  ctx.font = options.font
+  ctx.fillStyle = options.color
+  ctx.fillText(text, x, y)
+}
+
 function objectColor(index, count) {
   let hue = Math.round(360 * index / (count))
   return `hsl(${hue}, 100%, 50%)`
@@ -71,4 +83,38 @@ function intermediateColor(t, index, count) {
   let hue2 = Math.round(360 * (index+1) / (count))
   let hue = (1-t) * hue1 + t * hue2
   return `hsl(${hue}, 100%, 50%)`
+}
+
+function initAnalysisBox(ctx, left, top) {
+  ctx.strokeStyle = 'white'
+  ctx.strokeRect(left, top, ANALYSIS_BOX_SIZE, ANALYSIS_BOX_SIZE)
+  ctx.beginPath()
+  ctx.moveTo(left + ANALYSIS_BOX_SIZE / 2, top)
+  ctx.lineTo(left + ANALYSIS_BOX_SIZE / 2, top + ANALYSIS_BOX_SIZE)
+  ctx.moveTo(left, top + ANALYSIS_BOX_SIZE / 2)
+  ctx.lineTo(left + ANALYSIS_BOX_SIZE, top + ANALYSIS_BOX_SIZE / 2)
+  ctx.stroke()
+}
+
+function getVelocityQuadrantTopLeft() {
+  return new Point(
+    window.innerWidth - ANALYSIS_BOX_SIZE - 16,
+    16
+  )
+}
+
+function initVelocityQuadrant(ctx) {
+  let p = getVelocityQuadrantTopLeft()
+  initAnalysisBox(ctx, p.x, p.y)
+  drawText(ctx, 'Velocity', p.x, p.y + ANALYSIS_BOX_SIZE + 20)
+}
+
+function drawVelocity(ctx, v, options) {
+  let p = getVelocityQuadrantTopLeft()
+  let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
+  let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
+  drawCurvePoint(ctx, new Point(x, y), {
+    ...{ width: 2, radius: 2, filled: true },
+    ...options
+  })
 }

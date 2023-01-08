@@ -72,9 +72,7 @@ function draw() {
 
 
   // write fps
-  ctx.fillStyle = 'white'
-  ctx.font = '12pt sans-serif'
-  ctx.fillText(`Speed: ${avgDuration} ms`, 10, window.innerHeight - 20)
+  drawText(ctx, `Frame: ${avgDuration} ms`, 10, window.innerHeight - 20)
 
   // iterate
   requestAnimationFrame(draw)
