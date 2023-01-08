@@ -101,15 +101,29 @@ function bezierspline() {
     window.location.reload()
   })
 
+  let ptime = null
+  let ppoint = null
+  let velocities = []
+
   return {
 
     objects: () => [ add, reset, ...points ],
 
     draw: function(ctx, time) {
 
+      // reset
+      if (ptime != null && time < ptime) {
+        velocities = []
+        ppoint = null
+        ptime = null
+      }
+
       // draw our buttons
       add.draw(ctx)
       reset.draw(ctx)
+
+      // analysis boxes
+      initVelocityQuadrant(ctx)
 
       // draw our points and join them
       for (let i=0; i<points.length; i++) {
@@ -137,7 +151,7 @@ function bezierspline() {
         let p3 = points[s+1].endpoint1()
         let p4 = points[s+1].p
         let color = objectColor(s, points.length)
-        
+
         for (let u=0; u <= (s==su.s ? su.u : 1); u += inc) {
           p5 = lerpPoints(p1, p2, u)
           p6 = lerpPoints(p2, p3, u)
@@ -163,6 +177,54 @@ function bezierspline() {
           drawIntermediatePoint(ctx, p, { color: pColor })
         }
 
+      }
+
+      // calc velocity
+      let save = false
+      if (ppoint != null && ptime != null) {
+        
+        if (time - ptime > 0.001) {
+          
+          // calc
+          let vx = (p.x - ppoint.x) / (time - ptime)
+          let vy = (p.y - ppoint.y) / (time - ptime)
+          let velocity = new Vector(vx, vy)
+
+          // save
+          velocities.push({
+            time: time,
+            point: p,
+            velocity: velocity,
+            color: objectColor(su.s, points.length)
+          })
+
+          // save
+          save = true
+        
+        }
+
+      }
+
+      // save
+      if (save || ptime == null) {
+        ppoint = p
+        ptime = time
+      }
+
+      // draw current
+      if (velocities.length) {
+        let velocity = velocities[velocities.length-1]
+        let normed = velocity.velocity.normalized().scaled(50)
+        joinIntermediatePoints(ctx, p, normed.endpoint(p), { color: 'white', width: 5 })
+      }
+
+      // now draw all
+      let maxnorm = 0
+      for (let v of velocities) {
+        maxnorm = Math.max(maxnorm, v.velocity.norm())
+      }
+      for (let v of velocities) {
+        drawVelocity(ctx, v.velocity.scaled(1/maxnorm), { color: v.color })
       }
 
     }
