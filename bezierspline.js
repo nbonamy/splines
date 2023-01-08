@@ -92,16 +92,16 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, yield) {
   let p5 = p1.clone()
   let p6 = p2.clone()
   let p7 = p3.clone()
-  let v1 = new Vector(p1, p2).scaled(inctime)
-  let v2 = new Vector(p2, p3).scaled(inctime)
-  let v3 = new Vector(p3, p4).scaled(inctime)
+  let v1 = new Vector(p1, p2)
+  let v2 = new Vector(p2, p3)
+  let v3 = new Vector(p3, p4)
 
   for (let u=0; u <= maxtime; u += inctime) {
     if (u != 0) {
       // move points with their vector
-      p5 = p5.movedby(v1)
-      p6 = p6.movedby(v2)
-      p7 = p7.movedby(v3)
+      p5 = p5.movedby(v1.scaled(inctime))
+      p6 = p6.movedby(v2.scaled(inctime))
+      p7 = p7.movedby(v3.scaled(inctime))
     }
     p8 = lerpPoints(p5, p6, u)
     p9 = lerpPoints(p6, p7, u)
