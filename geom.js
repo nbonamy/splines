@@ -108,3 +108,25 @@ class Vector extends Point {
     return Math.atan2(this.y, this.x)
   }
 }
+
+class Rect {
+  constructor(x, y, w, h) {
+    this.x = x
+    this.y = y
+    this.w = w
+    this.h = h
+  }
+
+  topleft() {
+    return new Point(this.x, this.y)
+  }
+  
+  bottomright() {
+    return new Point(this.x + this.w, this.y + this.h)
+  }
+
+  contains(p) {
+    return p.x >= this.x && p.x <= (this.x + this.w) && p.y >= this.y && p.y <= (this.y + this.h)
+  }
+
+}

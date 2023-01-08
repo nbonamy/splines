@@ -110,54 +110,59 @@ function initAnalysisBox(ctx, left, top) {
   ctx.stroke()
 }
 
-function getVelocityQuadrantTopLeft() {
-  return new Point(
+function getVelocityQuadrantRect() {
+  return new Rect(
     window.innerWidth - ANALYSIS_BOX_SIZE - 16,
-    16
+    16, ANALYSIS_BOX_SIZE, ANALYSIS_BOX_SIZE
   )
 }
 
 function initVelocityQuadrant(ctx) {
   if (ctx.disabled) return
-  let p = getVelocityQuadrantTopLeft()
-  initAnalysisBox(ctx, p.x, p.y)
-  drawText(ctx, 'Velocity', p.x, p.y + ANALYSIS_BOX_SIZE + 20)
+  let rect = getVelocityQuadrantRect()
+  initAnalysisBox(ctx, rect.x, rect.y)
+  drawText(ctx, 'Velocity', rect.x, rect.y + rect.h + 20)
 }
 
 function drawVelocity(ctx, v, options) {
   if (ctx.disabled) return
-  let p = getVelocityQuadrantTopLeft()
-  let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
-  let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
-  drawCurvePoint(ctx, new Point(x, y), {
-    ...{ width: 1, radius: 1, filled: true },
-    ...options
-  })
+  let rect = getVelocityQuadrantRect()
+  let x = rect.x + rect.w/2 + v.x * rect.w/2
+  let y = rect.y + rect.h/2 + v.y * rect.h/2
+  if (rect.contains(new Point(x, y))) {
+    drawCurvePoint(ctx, new Point(x, y), {
+      ...{ width: 1, radius: 1, filled: true },
+      ...options
+    })
+  }
 }
 
-function getAccelerationQuadrantTopLeft() {
-  return new Point(
+function getAccelerationQuadrantRect() {
+  return new Rect(
     window.innerWidth - ANALYSIS_BOX_SIZE - 16,
     16 + ANALYSIS_BOX_SIZE + 20 + 16,
+    ANALYSIS_BOX_SIZE, ANALYSIS_BOX_SIZE
   )
 }
 
 function initAccelerationQuadrant(ctx) {
   if (ctx.disabled) return
-  let p = getAccelerationQuadrantTopLeft()
-  initAnalysisBox(ctx, p.x, p.y)
-  drawText(ctx, 'Acceleration', p.x, p.y + ANALYSIS_BOX_SIZE + 20)
+  let rect = getAccelerationQuadrantRect()
+  initAnalysisBox(ctx, rect.x, rect.y)
+  drawText(ctx, 'Acceleration', rect.x, rect.y + rect.h + 20)
 }
 
 function drawAcceleration(ctx, v, options) {
   if (ctx.disabled) return
-  let p = getAccelerationQuadrantTopLeft()
-  let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
-  let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
-  drawCurvePoint(ctx, new Point(x, y), {
-    ...{ width: 1, radius: 1, filled: true },
-    ...options
-  })
+  let rect = getAccelerationQuadrantRect()
+  let x = rect.x + rect.w/2 + v.x * rect.w/2
+  let y = rect.y + rect.h/2 + v.y * rect.h/2
+  if (rect.contains(new Point(x, y))) {
+    drawCurvePoint(ctx, new Point(x, y), {
+      ...{ width: 1, radius: 1, filled: true },
+      ...options
+    })
+  }
 }
 
 function drawVelocityVector(ctx, p, v, options) {

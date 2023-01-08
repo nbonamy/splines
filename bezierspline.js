@@ -2,6 +2,7 @@
 const HANDLE_SIZE = 3
 
 let method = window.localStorage.bezierSplineMethod||'polynomial'
+let density = window.localStorage.bezierSplineDensity||'normal'
 let showVelocity = true
 
 class ControlPoint {
@@ -75,7 +76,7 @@ function lerp4(p1, p2, p3, p4, maxtime, inctime, yield) {
     p8 = lerpPoints(p5, p6, u)
     p9 = lerpPoints(p6, p7, u)
     p = lerpPoints(p8, p9, u)
-    yield(u, p)
+    inctime = yield(u, p)
   }
 
   return [
@@ -104,7 +105,7 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, yield) {
     p8 = lerpPoints(p5, p6, u)
     p9 = lerpPoints(p6, p7, u)
     p = lerpPoints(p8, p9, u)
-    yield(u, p)
+    inctime = yield(u, p)
   }
 
   return [
@@ -126,7 +127,7 @@ function polynomial(p1, p2, p3, p4, maxtime, inctime, yield) {
     let u2 = u * u
     let u3 = u2 * u
     let p = v0.clone().add(v1.scaled(u)).add(v2.scaled(u2)).add(v3.scaled(u3))
-    yield(u, p)
+    inctime = yield(u, p)
   }
 
   return null
@@ -186,6 +187,20 @@ function bezierspline() {
         }
       },
       {
+        type: 'select',
+        label: 'Points Density',
+        options: {
+          'normal': 'Normal',
+          'adaptative': 'Adaptative',
+          'sparse': 'Sparse'
+        },
+        selected: density,
+        callback: (d) => {
+          density = d
+          window.localStorage.bezierSplineDensity = density
+        }
+      },
+      {
         type: 'checkbox',
         label: 'Show velocity',
         value: showVelocity,
@@ -196,6 +211,9 @@ function bezierspline() {
     objects: () => points,
 
     draw: function(ctx, time) {
+
+      // stats
+      let pointsPlotted = 0
 
       // to calc velocity
       let ppoint = null
@@ -220,20 +238,22 @@ function bezierspline() {
       //   maxdist = Math.max(maxdist, p1.distance(p2))
       // }
 
-      // calculation increment
-      let inctime = CALCULATION_STEP//Math.max(CALCULATION_STEP, maxdist / 6e5)
-
       // lerp
       let su = segmentAndTime(time, points.length-1)
       for (let s=0; s <= su.s; s++) {
         if (s == points.length - 1) continue
         
+        // our points
         let p1 = points[s].p
         let p2 = points[s].endpoint2()
         let p3 = points[s+1].endpoint1()
         let p4 = points[s+1].p
 
+        // segment length
         let color = objectColor(s, points.length)
+
+        // reset increment
+        let inctime = density == 'sparse' ? CALCULATION_STEP * 5 : CALCULATION_STEP//Math.max(CALCULATION_STEP, maxdist / 6e5)
 
         // the callback everytime a point will be calculated
         let cb = (u, p) => {
@@ -241,16 +261,19 @@ function bezierspline() {
           // 1st draw it
           pColor = intermediateColor(u, s, points.length)
           drawCurvePoint(ctx, p, { color: pColor })
+          pointsPlotted++;
 
           // calc velocity
-          if (showVelocity && ppoint != null) {
+          if (ppoint != null) {
 
             // velocity
             let velocity = new Vector(ppoint, p).scaled(1/inctime)
-            drawVelocity(ctx, velocity.scaled(1/1000), { color: color })  // not sure how to get right scaling here
+            if (showVelocity) {
+              drawVelocity(ctx, velocity.scaled(1/1000), { color: color })  // not sure how to get right scaling here
+            }
 
             // calc acceleration
-            if (pvelocity != null) {
+            if (showVelocity && pvelocity != null) {
               let acceleration = new Vector(pvelocity, velocity).scaled(1/inctime)
               drawAcceleration(ctx, acceleration.scaled(1/4000), { color: color }) // not sure how to get right scaling here
             }
@@ -261,6 +284,13 @@ function bezierspline() {
 
           // save
           ppoint = p
+
+          // update inc
+          if (density == 'adaptative' && pvelocity != null) {
+            inctime = 1 / pvelocity.norm() * Math.SQRT2
+          }
+          return inctime
+
         }
 
         // now calculate
@@ -290,6 +320,9 @@ function bezierspline() {
           drawVelocityVector(ctx, ppoint, pvelocity.normal().scaled(scaling))
         }
       }
+
+      // display stats
+      drawText(ctx, `Points: ${pointsPlotted}`, 10, window.innerHeight - 40)
 
     }
 

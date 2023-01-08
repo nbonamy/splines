@@ -35,7 +35,7 @@ function draw() {
   // init
   const canvas = document.getElementById('canvas');
   if (canvas.getContext == null) return
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { alpha: false });
 
   // disable
   ctx.disabled = drawingDisabled
