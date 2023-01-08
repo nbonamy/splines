@@ -87,6 +87,7 @@ function intermediateColor(t, index, count) {
 
 function initAnalysisBox(ctx, left, top) {
   ctx.strokeStyle = 'white'
+  ctx.lineWidth = 1
   ctx.strokeRect(left, top, ANALYSIS_BOX_SIZE, ANALYSIS_BOX_SIZE)
   ctx.beginPath()
   ctx.moveTo(left + ANALYSIS_BOX_SIZE / 2, top)
@@ -114,7 +115,30 @@ function drawVelocity(ctx, v, options) {
   let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
   let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
   drawCurvePoint(ctx, new Point(x, y), {
-    ...{ width: 2, radius: 2, filled: true },
+    ...{ width: 1, radius: 1, filled: true },
+    ...options
+  })
+}
+
+function getAccelerationQuadrantTopLeft() {
+  return new Point(
+    window.innerWidth - ANALYSIS_BOX_SIZE - 16,
+    16 + ANALYSIS_BOX_SIZE + 20 + 16,
+  )
+}
+
+function initAccelerationQuadrant(ctx) {
+  let p = getAccelerationQuadrantTopLeft()
+  initAnalysisBox(ctx, p.x, p.y)
+  drawText(ctx, 'Acceleration', p.x, p.y + ANALYSIS_BOX_SIZE + 20)
+}
+
+function drawAcceleration(ctx, v, options) {
+  let p = getAccelerationQuadrantTopLeft()
+  let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
+  let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
+  drawCurvePoint(ctx, new Point(x, y), {
+    ...{ width: 1, radius: 1, filled: true },
     ...options
   })
 }

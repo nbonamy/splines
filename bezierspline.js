@@ -2,7 +2,7 @@
 const HANDLE_SIZE = 3
 
 let method = 'naive'
-let showVelocity = false
+let showVelocity = true
 
 class ControlPoint {
   constructor(p, v1, v2, sym) {
@@ -141,10 +141,6 @@ function bezierspline() {
     ),
   ]
 
-  let ptime = null
-  let ppoint = null
-  let velocities = []
-
   return {
 
     controls: [
@@ -179,16 +175,12 @@ function bezierspline() {
 
     draw: function(ctx, time) {
 
-      // reset
-      if (ptime != null && time < ptime) {
-        velocities = []
-        ppoint = null
-        ptime = null
-      }
-
-      // analysis boxes
+      // to calc velocity
+      let ppoint = null
+      let pvelocity = null
       if (showVelocity) {
         initVelocityQuadrant(ctx)
+        initAccelerationQuadrant(ctx)
       }
 
       // draw our points and join them
@@ -207,7 +199,7 @@ function bezierspline() {
       // }
 
       // calculation increment
-      let inc = CALCULATION_STEP//Math.max(CALCULATION_STEP, maxdist / 6e5)
+      let inctime = CALCULATION_STEP//Math.max(CALCULATION_STEP, maxdist / 6e5)
 
       // lerp
       let su = segmentAndTime(time, points.length-1)
@@ -219,18 +211,46 @@ function bezierspline() {
         let p3 = points[s+1].endpoint1()
         let p4 = points[s+1].p
 
+        let color = objectColor(s, points.length)
+
         let cb = (u, p) => {
+
+          // 1st draw it
           pColor = intermediateColor(u, s, points.length)
           drawCurvePoint(ctx, p, { color: pColor })
+
+          // calc velocity
+          if (showVelocity && ppoint != null) {
+
+            // velocity
+            let vx = (p.x - ppoint.x) / inctime
+            let vy = (p.y - ppoint.y) / inctime
+            let velocity = new Vector(vx, vy).scaled(1/1000) // not sure how to get right scaling here
+            drawVelocity(ctx, velocity, { color: color })
+
+            // calc acceleration
+            if (pvelocity != null) {
+              let ax = (velocity.x - pvelocity.x) / inctime
+              let ay = (velocity.y - pvelocity.y) / inctime
+              let acceleration = new Vector(ax, ay).scaled(1/5) // not sure how to get right scaling here
+              drawAcceleration(ctx, acceleration, { color: color })
+            }
+
+            // save
+            pvelocity = velocity
+          }
+
+          // save
+          ppoint = p
         }
 
         let res = null
-        if (method == 'naive') res = lerp4(p1, p2, p3, p4, (s==su.s ? su.u : 1), inc,cb)
-        else if (method == 'optim') res = lerp4_optim(p1, p2, p3, p4, (s==su.s ? su.u : 1), inc, cb)
+        if (method == 'naive') res = lerp4(p1, p2, p3, p4, (s==su.s ? su.u : 1), inctime, cb)
+        else if (method == 'optim') res = lerp4_optim(p1, p2, p3, p4, (s==su.s ? su.u : 1), inctime, cb)
 
-        // draw intermediate points
+        // draw intermediate points for current segment
         if (s == su.s && showIntermediate && !isLastFrame(time)) {
-          joinIntermediatePoints(ctx, p2, p3, { color: objectColor(s, points.length) })
+          joinIntermediatePoints(ctx, p2, p3, { color: color })
           for (let i=0; i<2; i++) {
             for (let j=0; j<res[i].length; j++) {
               drawIntermediatePoint(ctx, res[i][j])
@@ -239,61 +259,7 @@ function bezierspline() {
               }
             }
           }
-          drawIntermediatePoint(ctx, res[2], { color: pColor })
         }
-      }
-
-      // calc velocity
-      let save = false
-      if (ppoint != null && ptime != null) {
-        
-        if (time - ptime > 0.001) {
-          
-          // calc
-          let vx = (p.x - ppoint.x) / (time - ptime)
-          let vy = (p.y - ppoint.y) / (time - ptime)
-          let velocity = new Vector(vx, vy)
-
-          // save
-          velocities.push({
-            time: time,
-            point: p,
-            velocity: velocity,
-            color: objectColor(su.s, points.length)
-          })
-
-          // save
-          save = true
-        
-        }
-
-      }
-
-      // save
-      if (save || ptime == null) {
-        ppoint = p
-        ptime = time
-      }
-
-      // draw
-      if (showVelocity) {
-
-        // draw current
-        if (velocities.length) {
-          let velocity = velocities[velocities.length-1]
-          let normed = velocity.velocity.normalized().scaled(50)
-          joinIntermediatePoints(ctx, p, normed.endpoint(p), { color: 'white', width: 5 })
-        }
-
-        // now draw all
-        let maxnorm = 0
-        for (let v of velocities) {
-          maxnorm = Math.max(maxnorm, v.velocity.norm())
-        }
-        for (let v of velocities) {
-          drawVelocity(ctx, v.velocity.scaled(1/maxnorm), { color: v.color })
-        }
-
       }
 
     }
