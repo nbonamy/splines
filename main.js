@@ -70,7 +70,7 @@ function draw() {
 
   // calc average duration
   let totalDuration = perfHistory.reduce((acc, h) => acc + h, 0)
-  let avgDuration = Math.round(totalDuration / perfHistory.length)
+  let avgDuration = (totalDuration / perfHistory.length).toFixed(drawingDisabled ? 1 : 0)
 
   // write fps
   drawText(ctx, `Frame: ${avgDuration} ms`, 10, window.innerHeight - 20)
