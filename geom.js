@@ -1,8 +1,5 @@
 
 const HITTEST_SENSITIVITY = 10
-const BUTTON_PADDING = 8
-const BUTTON_HEIGHT = 18
-const BUTTON_FONT = '12pt sans-serif'
 
 class Point {
   
