@@ -19,15 +19,19 @@ class Point {
     return new Point(this.x, this.y)
   }
 
-  hittest(e) {
-    let d = distance(new Point(e.clientX, e.clientY), this)
+  hittest(hit) {
+    let d = this.distance(hit)
     return d < HITTEST_SENSITIVITY
   }
+
+  distance(other) {
+    return new Vector(this, other).norm()
+  }
   
-  move(e) {
-    if (e.clientX != this.x || e.clientY != this.y) {
-      this.x = e.clientX
-      this.y = e.clientY
+  set(other) {
+    if (other.x != this.x || other.y != this.y) {
+      this.x = other.x
+      this.y = other.y
       return true
     } else {
       return false

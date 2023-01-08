@@ -33,22 +33,22 @@ class ControlPoint {
     if (!last) joinControlPoints(ctx, this.p, this.endpoint2(), { color: color })
   }
   
-  hittest(e) {
+  hittest(hit, e) {
     this.active = null
     this.moved = false
-    if (!e.shiftKey && this.p.hittest(e)) this.active = this.p
-    else if (this.endpoint1().hittest(e)) this.active = this.v1
-    else if (this.endpoint2().hittest(e)) this.active = this.v2
+    if (!e.shiftKey && this.p.hittest(hit)) this.active = this.p
+    else if (this.endpoint1().hittest(hit)) this.active = this.v1
+    else if (this.endpoint2().hittest(hit)) this.active = this.v2
     return this.active
   }
   
-  move(e) {
+  set(other) {
     if (this.active == this.p) {
-      if (this.p.move(e)) {
+      if (this.p.set(other)) {
         this.moved = true
       }
     } else {
-      this.active.set(new Vector(this.p, new Point(e.clientX, e.clientY)))
+      this.active.set(new Vector(this.p, other))
       if (this.sym) {
         if (this.active == this.v1) this.v2 = this.v1.opposite()
         else this.v1 = this.v2.opposite()
@@ -81,7 +81,6 @@ function lerp4(p1, p2, p3, p4, maxtime, inctime, yield) {
   return [
     [ p5, p6, p7 ],
     [ p8, p9 ],
-    p
   ]
 
 }
@@ -97,6 +96,7 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, yield) {
 
   for (let u=0; u <= maxtime; u += inctime) {
     if (u != 0) {
+      // move points with their vector
       p5 = v1.endpoint(p5)
       p6 = v2.endpoint(p6)
       p7 = v3.endpoint(p7)
@@ -110,7 +110,6 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, yield) {
   return [
     [ p5, p6, p7 ],
     [ p8, p9 ],
-    p
   ]
 
 }
@@ -139,7 +138,7 @@ function bezierspline() {
   let points = [
     new ControlPoint(
       new Point(500, 300),
-      new Vector(0, 0),
+      new Vector(250, 75),
       new Vector(-250, 75)
     ),
     new ControlPoint(
@@ -217,7 +216,7 @@ function bezierspline() {
       // for (let i=0; i<points.length-1; i++) {
       //   let p1 = points[i].p
       //   let p2 = points[i+1].p
-      //   maxdist = Math.max(maxdist, distance(p1, p2))
+      //   maxdist = Math.max(maxdist, p1.distance(p2))
       // }
 
       // calculation increment
@@ -235,6 +234,7 @@ function bezierspline() {
 
         let color = objectColor(s, points.length)
 
+        // the callback everytime a point will be calculated
         let cb = (u, p) => {
 
           // 1st draw it
@@ -245,17 +245,13 @@ function bezierspline() {
           if (showVelocity && ppoint != null) {
 
             // velocity
-            let vx = (p.x - ppoint.x) / inctime
-            let vy = (p.y - ppoint.y) / inctime
-            let velocity = new Vector(vx, vy).scaled(1/1000) // not sure how to get right scaling here
-            drawVelocity(ctx, velocity, { color: color })
+            let velocity = new Vector(ppoint, p).scaled(1/inctime)
+            drawVelocity(ctx, velocity.scaled(1/1000), { color: color })  // not sure how to get right scaling here
 
             // calc acceleration
             if (pvelocity != null) {
-              let ax = (velocity.x - pvelocity.x) / inctime
-              let ay = (velocity.y - pvelocity.y) / inctime
-              let acceleration = new Vector(ax, ay).scaled(1/5) // not sure how to get right scaling here
-              drawAcceleration(ctx, acceleration, { color: color })
+              let acceleration = new Vector(pvelocity, velocity).scaled(1/inctime)
+              drawAcceleration(ctx, acceleration.scaled(1/4000), { color: color }) // not sure how to get right scaling here
             }
 
             // save
@@ -266,6 +262,7 @@ function bezierspline() {
           ppoint = p
         }
 
+        // now calculate
         let res = null
         let maxtime = (s==su.s ? su.u : 1)
         if (method == 'naive') res = lerp4(p1, p2, p3, p4, maxtime, inctime, cb)
@@ -275,7 +272,7 @@ function bezierspline() {
         // draw intermediate points for current segment
         if (res != null && s == su.s && showIntermediate && !isLastFrame(time)) {
           joinIntermediatePoints(ctx, p2, p3, { color: color })
-          for (let i=0; i<2; i++) {
+          for (let i=0; i<res.length; i++) {
             for (let j=0; j<res[i].length; j++) {
               drawIntermediatePoint(ctx, res[i][j])
               if (j != res[i].length-1) {
@@ -287,7 +284,7 @@ function bezierspline() {
 
         // show velocity
         if (showVelocity && ppoint != null && pvelocity != null && s == su.s) {
-          let scaling = 50 // not sure how to get right scaling here
+          let scaling = 50/1000 // not sure how to get right scaling here
           drawVelocityVector(ctx, ppoint, pvelocity.scaled(scaling))
           drawVelocityVector(ctx, ppoint, pvelocity.normal().scaled(scaling))
         }

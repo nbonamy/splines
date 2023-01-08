@@ -18,10 +18,6 @@ function lerpPoints(p1, p2, t) {
   )
 }
 
-function distance(p1, p2) {
-  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2))
-}
-
 function segmentAndTime(time, count) {
   let globalTime = (time * animationTime) / (animationTime / count)
   let segment = Math.floor(globalTime)
@@ -143,14 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (objects == null) return
     if (typeof objects == 'function') objects = objects()
     for (let object of objects) {
-      if (object.hittest?.(e)) {
+      if (object.hittest?.(new Point(e.clientX, e.clientY), e)) {
         hitTest = object
         break
       }
     }
   }
   canvas.onmousemove = (e) => {
-    hitTest?.move?.(e)
+    hitTest?.set?.(new Point(e.clientX, e.clientY))
   }
   canvas.onmouseup = (e) => {
     hitTest?.click?.(e)
