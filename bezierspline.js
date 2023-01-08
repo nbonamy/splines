@@ -21,8 +21,7 @@ class ControlPoint {
   }
   
   drawHandle(ctx, p, color) {
-    ctx.fillStyle = color
-    ctx.fillRect(p.x-HANDLE_SIZE, p.y-HANDLE_SIZE, 2*HANDLE_SIZE+1, 2*HANDLE_SIZE+1)
+    drawRect(ctx, p, { color: color, size: HANDLE_SIZE })
   }
   
   draw(ctx, first, last, color) {

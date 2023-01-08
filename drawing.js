@@ -2,6 +2,7 @@
 const ANALYSIS_BOX_SIZE = 200
 
 function drawPoint(ctx, p, options) {
+  if (ctx.disabled) return
   options = {
     ...{ color: 'white', width: 1, radius: 1, filled: false, },
     ...options
@@ -37,6 +38,7 @@ function drawIntermediatePoint(ctx, p, options) {
 }
 
 function joinPoints(ctx, p1, p2, options) {
+  if (ctx.disabled) return
   options = {
     ...{ color: 'white', width: 1 },
     ...options
@@ -73,6 +75,17 @@ function drawText(ctx, text, x, y, options) {
   ctx.fillText(text, x, y)
 }
 
+function drawRect(ctx, p, options) {
+  if (ctx.disabled) return
+  options = {
+    ...{ color: 'white', size: 3 },
+    ...options
+  }
+  ctx.fillStyle = options.color
+  ctx.fillRect(p.x-options.size, p.y-options.size, 2*options.size+1, 2*options.size+1)
+
+}
+
 function objectColor(index, count) {
   let hue = Math.round(360 * index / (count))
   return `hsl(${hue}, 100%, 50%)`
@@ -105,12 +118,14 @@ function getVelocityQuadrantTopLeft() {
 }
 
 function initVelocityQuadrant(ctx) {
+  if (ctx.disabled) return
   let p = getVelocityQuadrantTopLeft()
   initAnalysisBox(ctx, p.x, p.y)
   drawText(ctx, 'Velocity', p.x, p.y + ANALYSIS_BOX_SIZE + 20)
 }
 
 function drawVelocity(ctx, v, options) {
+  if (ctx.disabled) return
   let p = getVelocityQuadrantTopLeft()
   let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
   let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
@@ -128,12 +143,14 @@ function getAccelerationQuadrantTopLeft() {
 }
 
 function initAccelerationQuadrant(ctx) {
+  if (ctx.disabled) return
   let p = getAccelerationQuadrantTopLeft()
   initAnalysisBox(ctx, p.x, p.y)
   drawText(ctx, 'Acceleration', p.x, p.y + ANALYSIS_BOX_SIZE + 20)
 }
 
 function drawAcceleration(ctx, v, options) {
+  if (ctx.disabled) return
   let p = getAccelerationQuadrantTopLeft()
   let x = p.x + ANALYSIS_BOX_SIZE/2 + v.x * ANALYSIS_BOX_SIZE/2
   let y = p.y + ANALYSIS_BOX_SIZE/2 + v.y * ANALYSIS_BOX_SIZE/2
@@ -144,6 +161,7 @@ function drawAcceleration(ctx, v, options) {
 }
 
 function drawVelocityVector(ctx, p, v, options) {
+  if (ctx.disabled) return
 
   // default
   options = {

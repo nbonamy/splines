@@ -6,6 +6,7 @@ let animationTime = window.localStorage.animationTime || 4000
 let animationRepeat = true
 let showControlPoints = true
 let showIntermediate = true
+let drawingDisabled = false
 let activeScene = null
 let perfHistory = []
 let hitTest = null
@@ -35,6 +36,9 @@ function draw() {
   const canvas = document.getElementById('canvas');
   if (canvas.getContext == null) return
   const ctx = canvas.getContext('2d');
+
+  // disable
+  ctx.disabled = drawingDisabled
 
   // start
   const frameStart = performance.now()
@@ -166,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
   repeat_check.checked = animationRepeat
   repeat_check.onchange = (_) => animationRepeat = repeat_check.checked
   
-  // intermediate
+  // control point
   let control_check = document.querySelector('[name=control]')
   control_check.checked = showControlPoints
   control_check.onchange = (_) => showControlPoints = control_check.checked
@@ -175,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let intermediate_check = document.querySelector('[name=intermediate]')
   intermediate_check.checked = showIntermediate
   intermediate_check.onchange = (_) => showIntermediate = intermediate_check.checked
+  
+  // quiet
+  let quiet_check = document.querySelector('[name=quiet]')
+  quiet_check.checked = drawingDisabled
+  quiet_check.onchange = (_) => drawingDisabled = quiet_check.checked
   
   // scene
   let scene_select = document.querySelector('[name=scene]')
