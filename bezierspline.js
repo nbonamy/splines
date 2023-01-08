@@ -20,19 +20,15 @@ class ControlPoint {
     return this.p.movedby(this.v2)
   }
   
-  drawHandle(ctx, p, color) {
-    drawRect(ctx, p, { color: color, size: HANDLE_SIZE })
-  }
-  
   draw(ctx, first, last, color) {
     if (this.sym) drawRect(ctx, this.p, { color: color, size: 5 })
     else drawControlPoint(ctx, this.p, { color: color, radius: 6, filled: true })
     if (!first) {
-      this.drawHandle(ctx, this.endpoint1(), color)
+      drawRect(ctx, this.endpoint1(), { color: color, size: HANDLE_SIZE })
       joinControlPoints(ctx, this.p, this.endpoint1(), { color: color })
     }
     if (!last) {
-      this.drawHandle(ctx, this.endpoint2(), color)
+      drawRect(ctx, this.endpoint2(), { color: color, size: HANDLE_SIZE })
       joinControlPoints(ctx, this.p, this.endpoint2(), { color: color })
     }
   }
