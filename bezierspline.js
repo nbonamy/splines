@@ -1,7 +1,7 @@
 
 const HANDLE_SIZE = 3
 
-let method = 'naive'
+let method = 'polynomial'
 let showVelocity = true
 
 class ControlPoint {
@@ -116,6 +116,42 @@ function lerp4_optim(p1, p2, p3, p4, maxtime, inctime, cb) {
 
 }
 
+// https://youtu.be/jvPPXbo87ds?t=433
+function polynomial(p1, p2, p3, p4, maxtime, inctime, cb) {
+
+  let v0 = new Vector(
+    p1.x,
+    p1.y
+  )
+  let v1 = new Vector(
+    -3 * p1.x + 3 * p2.x,
+    -3 * p1.y + 3 * p2.y,
+  )
+  let v2 = new Vector(
+    3 * p1.x - 6 * p2.x + 3 * p3.x,
+    3 * p1.y - 6 * p2.y + 3 * p3.y,
+  )
+  let v3 = new Vector(
+    - p1.x + 3 * p2.x - 3 * p3.x + p4.x,
+    - p1.y + 3 * p2.y - 3 * p3.y + p4.y,
+  )
+    
+  for (let u=0; u <= maxtime; u += inctime) {
+
+    let u2 = u * u
+    let u3 = u2 * u
+    let p = new Point(
+      v0.x + u * v1.x + u2 * v2.x + u3 * v3.x, 
+      v0.y + u * v1.y + u2 * v2.y + u3 * v3.y, 
+    )
+
+    cb(u, p)
+  }
+
+  return null
+
+}
+
 function bezierspline() {
 
   let points = [
@@ -159,8 +195,9 @@ function bezierspline() {
         options: {
           'naive': 'Naive Lerp',
           'optim': 'Optimized Lerp',
-          'matrix': 'Matrix'
+          'polynomial': 'Polynomial'
         },
+        selected: method,
         callback: (m) => method = m
       },
       {
@@ -245,11 +282,13 @@ function bezierspline() {
         }
 
         let res = null
-        if (method == 'naive') res = lerp4(p1, p2, p3, p4, (s==su.s ? su.u : 1), inctime, cb)
-        else if (method == 'optim') res = lerp4_optim(p1, p2, p3, p4, (s==su.s ? su.u : 1), inctime, cb)
+        let maxtime = (s==su.s ? su.u : 1)
+        if (method == 'naive') res = lerp4(p1, p2, p3, p4, maxtime, inctime, cb)
+        else if (method == 'optim') res = lerp4_optim(p1, p2, p3, p4, maxtime, inctime, cb)
+        else if (method == 'polynomial') res = polynomial(p1, p2, p3, p4, maxtime, inctime, cb)
 
         // draw intermediate points for current segment
-        if (s == su.s && showIntermediate && !isLastFrame(time)) {
+        if (res != null && s == su.s && showIntermediate && !isLastFrame(time)) {
           joinIntermediatePoints(ctx, p2, p3, { color: color })
           for (let i=0; i<2; i++) {
             for (let j=0; j<res[i].length; j++) {

@@ -109,6 +109,7 @@ function change_scene(scene) {
           let opt = document.createElement('option')
           opt.value = key
           opt.innerHTML = control.options[key]
+          opt.selected = (key == control.selected)
           widget.appendChild(opt)
         }
       }
