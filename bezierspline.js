@@ -199,15 +199,15 @@ function bezierspline() {
       }
 
       // calc max distance
-      let maxdist = 0
-      for (let i=0; i<points.length-1; i++) {
-        let p1 = points[i].p
-        let p2 = points[i+1].p
-        maxdist = Math.max(maxdist, distance(p1, p2))
-      }
+      // let maxdist = 0
+      // for (let i=0; i<points.length-1; i++) {
+      //   let p1 = points[i].p
+      //   let p2 = points[i+1].p
+      //   maxdist = Math.max(maxdist, distance(p1, p2))
+      // }
 
       // calculation increment
-      let inc = Math.max(CALCULATION_STEP, maxdist / 6e5)
+      let inc = CALCULATION_STEP//Math.max(CALCULATION_STEP, maxdist / 6e5)
 
       // lerp
       let su = segmentAndTime(time, points.length-1)
@@ -218,35 +218,29 @@ function bezierspline() {
         let p2 = points[s].endpoint2()
         let p3 = points[s+1].endpoint1()
         let p4 = points[s+1].p
-        let color = objectColor(s, points.length)
+
+        let cb = (u, p) => {
+          pColor = intermediateColor(u, s, points.length)
+          drawCurvePoint(ctx, p, { color: pColor })
+        }
 
         let res = null
-        if (method == 'naive') {
-          res = lerp4(p1, p2, p3, p4, (s==su.s ? su.u : 1), inc, (u, p) => {
-            pColor = intermediateColor(u, s, points.length)
-            drawCurvePoint(ctx, p, { color: pColor })
-          })
-        } else if (method == 'optim') {
-          res = lerp4_optim(p1, p2, p3, p4, (s==su.s ? su.u : 1), inc, (u, p) => {
-            pColor = intermediateColor(u, s, points.length)
-            drawCurvePoint(ctx, p, { color: pColor })
-          })
-        }
+        if (method == 'naive') res = lerp4(p1, p2, p3, p4, (s==su.s ? su.u : 1), inc,cb)
+        else if (method == 'optim') res = lerp4_optim(p1, p2, p3, p4, (s==su.s ? su.u : 1), inc, cb)
 
         // draw intermediate points
         if (s == su.s && showIntermediate && !isLastFrame(time)) {
-          joinIntermediatePoints(ctx, p2, p3, { color: color })
-          joinIntermediatePoints(ctx, res[0][0], res[0][1], { color: 'cyan' })
-          joinIntermediatePoints(ctx, res[0][1], res[0][2], { color: 'cyan' })
-          joinIntermediatePoints(ctx, res[1][0], res[1][1], { color: 'green' })
-          drawIntermediatePoint(ctx, res[0][0], { color: 'cyan' })
-          drawIntermediatePoint(ctx, res[0][1], { color: 'cyan' })
-          drawIntermediatePoint(ctx, res[0][2], { color: 'cyan' })
-          drawIntermediatePoint(ctx, res[1][0], { color: 'green' })
-          drawIntermediatePoint(ctx, res[1][1], { color: 'green' })
-          drawIntermediatePoint(ctx, p, { color: pColor })
+          joinIntermediatePoints(ctx, p2, p3, { color: objectColor(s, points.length) })
+          for (let i=0; i<2; i++) {
+            for (let j=0; j<res[i].length; j++) {
+              drawIntermediatePoint(ctx, res[i][j])
+              if (j != res[i].length-1) {
+                joinIntermediatePoints(ctx, res[i][j], res[i][j+1])
+              }
+            }
+          }
+          drawIntermediatePoint(ctx, res[2], { color: pColor })
         }
-
       }
 
       // calc velocity

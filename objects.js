@@ -50,7 +50,7 @@ class Vector extends Point {
   }
 }
 
-class Button {
+class Button_Deprecated {
   constructor(x,y, title, cb, options) {
     this.x = x
     this.y = y

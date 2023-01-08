@@ -57,7 +57,7 @@ function joinControlPoints(ctx, p1, p2, options) {
 }
 
 function joinIntermediatePoints(ctx, p1, p2, options) {
-  joinControlPoints(ctx, p1, p2, {
+  joinPoints(ctx, p1, p2, {
     ...{ width: 0.5 },
     ...options
   })
