@@ -19,13 +19,6 @@ function lerpPoints(p1, p2, t) {
   )
 }
 
-function segmentAndTime(time, count) {
-  let globalTime = (time * animationTime) / (animationTime / count)
-  let segment = Math.floor(globalTime)
-  let localTime = globalTime - segment
-  return { s: segment, u: localTime }
-}
-
 function isLastFrame(time) {
   return animationRepeat == false && time >= 1
 }
@@ -52,7 +45,7 @@ function draw() {
   if (animationRepeat) {
     time = (time % animationTime) / animationTime
   } else {
-    time = Math.min(1, time / animationTime)
+    time = 1
   }
 
   // specific draw

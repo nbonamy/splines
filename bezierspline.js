@@ -3,6 +3,7 @@ const HANDLE_SIZE = 3
 
 let method = window.localStorage.bezierSplineMethod||'polynomial'
 let density = window.localStorage.bezierSplineDensity||'normal'
+let timealloc = window.localStorage.bezierSplineTimeAlloc||'linear'
 let showVelocity = true
 
 class ControlPoint {
@@ -201,6 +202,19 @@ function bezierspline() {
         }
       },
       {
+        type: 'select',
+        label: 'Segment Time Allocation',
+        options: {
+          'linear': 'Same for all',
+          'proportional': 'Length based',
+        },
+        selected: timealloc,
+        callback: (t) => {
+          timealloc = t
+          window.localStorage.bezierSplineTimeAlloc = timealloc
+        }
+      },
+      {
         type: 'checkbox',
         label: 'Show velocity',
         value: showVelocity,
@@ -238,8 +252,11 @@ function bezierspline() {
       //   maxdist = Math.max(maxdist, p1.distance(p2))
       // }
 
+      // calc time
+      let timeManager = new TimeManager(animationTime, points.map((p) => p.p), timealloc)
+
       // lerp
-      let su = segmentAndTime(time, points.length-1)
+      let su = timeManager.getSegmentIndexAndLocalTime(time * animationTime)
       for (let s=0; s <= su.s; s++) {
         if (s == points.length - 1) continue
         
