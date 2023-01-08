@@ -25,11 +25,16 @@ class ControlPoint {
   }
   
   draw(ctx, first, last, color) {
-    drawControlPoint(ctx, this.p, { color: color, radius: this.sym ? 6 : 5, filled: true })
-    if (!first) this.drawHandle(ctx, this.endpoint1(), color)
-    if (!last) this.drawHandle(ctx, this.endpoint2(), color)
-    if (!first) joinControlPoints(ctx, this.p, this.endpoint1(), { color: color })
-    if (!last) joinControlPoints(ctx, this.p, this.endpoint2(), { color: color })
+    if (this.sym) drawRect(ctx, this.p, { color: color, size: 5 })
+    else drawControlPoint(ctx, this.p, { color: color, radius: 6, filled: true })
+    if (!first) {
+      this.drawHandle(ctx, this.endpoint1(), color)
+      joinControlPoints(ctx, this.p, this.endpoint1(), { color: color })
+    }
+    if (!last) {
+      this.drawHandle(ctx, this.endpoint2(), color)
+      joinControlPoints(ctx, this.p, this.endpoint2(), { color: color })
+    }
   }
   
   hittest(hit, e) {
@@ -144,6 +149,7 @@ function bezierspline() {
       new Point(550, 650),
       new Vector(-200, -50),
       new Vector(200, 50),
+      true
     ),
     new ControlPoint(
       new Point(900, 200),
