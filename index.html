@@ -12,7 +12,7 @@
         width: 100%;
         height: 100%;
       }
-      #params {
+      #controls {
         position: absolute;
         top: 8px;
         left: 8px;
@@ -22,33 +22,45 @@
         border: 1px solid white;
         padding: 8px;
       }
-      #params > div {
+      #controls > div {
         margin-top: 4px;
         margin-bottom: 4px;
       }
-      #params label {
+      #controls hr {
+        margin-top: 16px;
+        margin-bottom: 16px;
+      }
+      #controls label {
         display: inline-block;
         text-align: right;
         margin-right: 8px;
         width: 180px;
       }
+      #controls button {
+        padding: 4px;
+      }
     </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
-    <div id="params">
+    <div id="controls">
       <div>
-        <label for="intermediate">Show intermediate points</label>
-        <input type="checkbox" name="intermediate"/>
+        <label for="speed">Animation Speed</label>
+        <input type="range" min="100" max="10000" name="speed" />
       </div>
       <div>
         <label for="repeat">Repeat Animation</label>
         <input type="checkbox" name="repeat"/>
       </div>
       <div>
-        <label for="speed">Animation Speed</label>
-        <input type="range" min="100" max="10000" name="speed" />
+        <label for="control">Show control points</label>
+        <input type="checkbox" name="control"/>
       </div>
+      <div>
+        <label for="intermediate">Show intermediate points</label>
+        <input type="checkbox" name="intermediate"/>
+      </div>
+      <hr/>
       <div>
         <label for="scene">Scene</label>
         <select name="scene">

@@ -12,11 +12,13 @@ function bezier3() {
     draw: function(ctx, time) {
 
       // draw our point
-      drawControlPoint(ctx, P1)
-      drawControlPoint(ctx, P2)
-      drawControlPoint(ctx, P3)
-      joinControlPoints(ctx, P1, P2)
-      joinControlPoints(ctx, P2, P3)
+      if (showControlPoints) {
+        drawControlPoint(ctx, P1)
+        drawControlPoint(ctx, P2)
+        drawControlPoint(ctx, P3)
+        joinControlPoints(ctx, P1, P2)
+        joinControlPoints(ctx, P2, P3)
+      }
 
       // now lerp
       for (let t = 0; t <= time; t += CALCULATION_STEP) {

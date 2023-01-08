@@ -2,9 +2,10 @@
 const CALCULATION_STEP = 0.001
 const PERF_HISTORY_SIZE = 50
 
-let showIntermediate = true
 let animationTime = window.localStorage.animationTime || 4000
 let animationRepeat = true
+let showControlPoints = true
+let showIntermediate = true
 let activeScene = null
 let perfHistory = []
 let hitTest = null
@@ -70,7 +71,6 @@ function draw() {
   let totalDuration = perfHistory.reduce((acc, h) => acc + h, 0)
   let avgDuration = Math.round(totalDuration / perfHistory.length)
 
-
   // write fps
   drawText(ctx, `Frame: ${avgDuration} ms`, 10, window.innerHeight - 20)
 
@@ -80,9 +80,52 @@ function draw() {
 }
 
 function change_scene(scene) {
+
+  // switch
   window.localStorage.scene = scene
   startTime = performance.now()
   activeScene = eval(`${scene}()`)
+
+  // add controls
+  let controls = document.getElementById('controls')
+  document.querySelectorAll('#controls .scene').forEach((el) => el.remove())
+  if (activeScene.controls) {
+    for (let control of activeScene.controls) {
+
+      let widget = null
+      if (control.type == 'button') {
+        widget = document.createElement('button')
+        widget.innerHTML = control.label
+        widget.onclick = control.callback
+      } else if (control.type == 'checkbox') {
+        widget = document.createElement('input')
+        widget.type = 'checkbox'
+        widget.checked = control.value
+        widget.onchange = (e) => control.callback(e.target.checked)
+      } else if (control.type == 'select') {
+        widget = document.createElement('select')
+        widget.onchange = (e) => control.callback(e.target.value)
+        for (let key in control.options) {
+          let opt = document.createElement('option')
+          opt.value = key
+          opt.innerHTML = control.options[key]
+          widget.appendChild(opt)
+        }
+      }
+
+      if (widget != null) {
+        let div = document.createElement('div')
+        div.classList.add('scene')
+        let label = document.createElement('label')
+        label.innerHTML = control.label
+        div.appendChild(label)
+        div.appendChild(widget)
+        controls.appendChild(div)
+      }
+
+    }
+  }
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -112,16 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hitTest = null
   }
 
-  // intermediate
-  let intermediate_check = document.querySelector('[name=intermediate]')
-  intermediate_check.checked = showIntermediate
-  intermediate_check.onchange = (_) => showIntermediate = intermediate_check.checked
-  
-  // animation repeat
-  let repeat_check = document.querySelector('[name=repeat]')
-  repeat_check.checked = animationRepeat
-  repeat_check.onchange = (_) => animationRepeat = repeat_check.checked
-  
   // animation speed
   let speed_range = document.querySelector('[name=speed]')
   speed_range.value = speed_range.max - animationTime
@@ -130,6 +163,21 @@ document.addEventListener('DOMContentLoaded', () => {
     window.localStorage.animationTime = animationTime
   }
 
+  // animation repeat
+  let repeat_check = document.querySelector('[name=repeat]')
+  repeat_check.checked = animationRepeat
+  repeat_check.onchange = (_) => animationRepeat = repeat_check.checked
+  
+  // intermediate
+  let control_check = document.querySelector('[name=control]')
+  control_check.checked = showControlPoints
+  control_check.onchange = (_) => showControlPoints = control_check.checked
+  
+  // intermediate
+  let intermediate_check = document.querySelector('[name=intermediate]')
+  intermediate_check.checked = showIntermediate
+  intermediate_check.onchange = (_) => showIntermediate = intermediate_check.checked
+  
   // scene
   let scene_select = document.querySelector('[name=scene]')
   scene_select.onchange = (_) => change_scene(scene_select.value)

@@ -6,33 +6,33 @@ function bezierN() {
     new Point(750,250)
   ]
 
-  const add = new Button(window.innerWidth / 2, 32, 'Add a control point', () => {
-    points.push(new Point(window.innerWidth/2, window.innerHeight/2))    
-  })
-
-  const reset = new Button(window.innerWidth / 2, 80, 'Reset', () => {
-    points = [
-      new Point(500,500),
-      new Point(750,250)
-    ]
-  })
-
   return {
 
-    objects: () => [ add, reset, ...points ],
+    controls: [
+      {
+        type: 'button',
+        label: 'Add a control point',
+        callback: () => points.push(new Point(window.innerWidth/2, window.innerHeight/2))
+      },
+      {
+        type: 'button',
+        label: 'Reset',
+        callback: () => points = [ new Point(500,500), new Point(750,250) ]
+      },
+    ],
+    
+    objects: () => points,
 
     draw: function(ctx, time) {
 
-      // draw our buttons
-      add.draw(ctx)
-      reset.draw(ctx)
-
       // draw our points and join them
-      for (let point of points) {
-        drawControlPoint(ctx, point)
-      }
-      for (let i=0; i<points.length-1; i++) {
-        joinControlPoints(ctx, points[i], points[i+1])
+      if (showControlPoints) {
+        for (let point of points) {
+          drawControlPoint(ctx, point)
+        }
+        for (let i=0; i<points.length-1; i++) {
+          joinControlPoints(ctx, points[i], points[i+1])
+        }
       }
 
       // now lerp
