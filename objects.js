@@ -37,6 +37,17 @@ class Vector extends Point {
   hittest(origin, e) {
     return this.endpoint(origin).hittest(e)
   }
+  norm() {
+    return Math.sqrt(this.x*this.x + this.y*this.y)
+  }
+  scaled(scale) {
+    return new Vector(this.x * scale, this.y * scale)
+  }
+  normalized() {
+    let n = this.norm()
+    if (n < 1e-6) n = 1
+    return this.scaled(1/n)
+  }
 }
 
 class Button {
