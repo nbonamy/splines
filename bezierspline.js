@@ -284,6 +284,13 @@ function bezierspline() {
             }
           }
         }
+
+        // show velocity
+        if (showVelocity && ppoint != null && pvelocity != null && s == su.s) {
+          let scaling = 50 // not sure how to get right scaling here
+          drawVelocityVector(ctx, ppoint, pvelocity.scaled(scaling))
+          drawVelocityVector(ctx, ppoint, pvelocity.normal().scaled(scaling))
+        }
       }
 
     }

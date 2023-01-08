@@ -142,3 +142,37 @@ function drawAcceleration(ctx, v, options) {
     ...options
   })
 }
+
+function drawVelocityVector(ctx, p, v, options) {
+
+  // default
+  options = {
+    ...{ color: 'white', width: 5, size: 7.5 },
+    ...options
+  }
+
+  // set
+  ctx.fillStyle = options.color
+  ctx.strokeStyle = options.color
+  ctx.lineWidth = options.width
+  ctx.save()
+
+  // now draw line
+  ctx.beginPath()
+  ctx.translate(p.x, p.y)
+  ctx.rotate(v.angle())
+  ctx.moveTo(0, 0)
+  ctx.lineTo(v.norm(), 0)
+  ctx.stroke()
+
+  // and arrow tip
+  ctx.translate(v.norm(), 0)
+  ctx.moveTo(0, options.size)
+  ctx.lineTo(options.size, 0)
+  ctx.lineTo(0, -options.size)
+  ctx.fill()
+
+  // done
+  ctx.restore()
+
+}

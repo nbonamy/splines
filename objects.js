@@ -98,8 +98,16 @@ class Vector extends Point {
     return new Vector(-this.x, -this.y)
   }
 
+  normal() {
+    return new Vector(-this.y, this.x)
+  }
+
   dot(other) {
     return this.x * other.x + this.y + other.y
+  }
+
+  angle() {
+    return Math.atan2(this.y, this.x)
   }
 }
 
